@@ -1,4 +1,5 @@
-import React, {Component} from 'react';
+import React, {component} from 'react';
+import { connect } from "react-redux";
 //import './App.css';
 import Cardlist from '../Components/cardlist';
 import SearchBox from '../Components/search';
@@ -6,17 +7,37 @@ import Scroll from '../Components/scroll';
 import 'tachyons';
 //import { robots } from './robots';
 
+import { setSearchField } from "../actions";
+
+
+const mapStateToProps = state => {
+
+  return{
+
+    searchField: state.searchField
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+
+  return {
+
+  onSearchChange: (event) => dispatch(setSearchField(event.target.value))
+}
+}
+
 class  App extends  React.Component {
   constructor() {
     super()
     this.state = {
 
-      robots: [],
-      searchfield: ''
+      robots: []
     }
   }
 
   componentDidMount() {
+
+    console.log(this.props.store.getstate());
 
     fetch('https://jsonplaceholder.typicode.com/users').then(response => {
 
@@ -28,17 +49,14 @@ class  App extends  React.Component {
       
   }
 
-  onSearchChange = (event) => {
-
-    this.setState({ searchfield: event.target.value})
-    
-  }
+ 
   render() {
 
-    const { robots, searchfield} = this.state;
+    const { robots } = this.state;
+    const { searchField, onSearchChange } = this.props;
 
     const filteredRobots = robots.filter(robots =>{
-      return robots.name.toLowerCase().includes(searchfield.toLowerCase());
+      return robots.name.toLowerCase().includes(searchField.toLowerCase());
     });
     if(robots.length === 0)  {
 
@@ -47,7 +65,7 @@ class  App extends  React.Component {
   return (
     <div className='tc'>
     <h1>Robo Friends </h1>
-    <SearchBox searchChange={this.onSearchChange}/>
+    <SearchBox searchChange={onSearchChange}/>
     <Scroll>
     <Cardlist robots={filteredRobots} />
 
@@ -58,4 +76,4 @@ class  App extends  React.Component {
 }
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);
